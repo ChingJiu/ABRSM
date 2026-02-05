@@ -149,4 +149,10 @@ function spinWheel() {
     canvas.style.transform = `rotate(${spin}deg)`;
 
     setTimeout(() => {
-        document.getElementById(
+        document.getElementById("result").innerText = pedals[randomIndex].replace("\n", " — ");
+    }, 4000);
+}
+</script>
+
+</body>
+</html>
