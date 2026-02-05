@@ -27,10 +27,10 @@ nav a {
     letter-spacing: 0.5px;
 }
 
-nav a :hover{
+nav a:hover {
     text-decoration: underline;
 }
-        
+
 header {
     margin-top: 30px;
     text-align: center;
@@ -44,8 +44,8 @@ header h1 {
 #wheel-container {
     margin-top: 30px;
     position: relative;
-    width: 350px;
-    height: 350px;
+    width: 450px;
+    height: 450px;
 }
 
 #wheel {
@@ -56,35 +56,23 @@ header h1 {
     transition: transform 4s cubic-bezier(0.17, 0.67, 0.12, 0.99);
 }
 
-.choice-buttons {
-    margin-top: 25px;
-    display: flex;
-    gap: 15px;
-}
-
-.choice-buttons button {
-    padding: 10px 15px;
+#spin-scale, #draw-hand {
+    margin-top: 15px;
+    padding: 10px 22px;
     border: 1px solid #e6e1db;
-    background: transparent;
-    color: #e6e1db;
+    background: #e6e1db;
+    color: #0f1420;
+    font-size: 14px;
     font-family: "Times New Roman", serif;
     cursor: pointer;
 }
 
-.choice-buttons button.active {
-    background: #e6e1db;
-    color: #0f1420;
-}
-
-#spin {
+#hand-box {
     margin-top: 20px;
-    padding: 12px 25px;
+    padding: 12px 22px;
     border: 1px solid #e6e1db;
-    background: #e6e1db;
-    color: #0f1420;
-    font-size: 16px;
-    font-family: "Times New Roman", serif;
-    cursor: pointer;
+    min-width: 220px;
+    text-align: center;
 }
 
 #result {
@@ -106,16 +94,13 @@ header h1 {
 </header>
 
 <div id="wheel-container">
-    <canvas id="wheel" width="350" height="350"></canvas>
+    <canvas id="wheel" width="450" height="450"></canvas>
 </div>
 
-<div class="choice-buttons">
-    <button id="leftBtn" onclick="setHand('Left Hand')">Left Hand</button>
-    <button id="bothBtn" onclick="setHand('Both Hands')" class="active">Both Hands</button>
-    <button id="rightBtn" onclick="setHand('Right Hand')">Right Hand</button>
-</div>
+<button id="spin-scale" onclick="spinScale()">SPIN SCALE</button>
 
-<button id="spin" onclick="spinWheel()">SPIN</button>
+<div id="hand-box">Hand: —</div>
+<button id="draw-hand" onclick="drawHand()">DRAW HAND</button>
 
 <div id="result"></div>
 
@@ -124,31 +109,23 @@ const scales = [
 "C Major","G Major","D Major","A Major","E Major","B Major","F# Major",
 "F Major","Bb Major","Eb Major","Ab Major","Db Major",
 "A Minor (harmonic)","E Minor (harmonic)","B Minor (harmonic)",
-"F# Minor (harmonic)","C# Minor (harmonic)", "G# Minor (harmonic)",
-"D Minor (harmonic)", "G Minor (harmonic)", "C Minor (harmonic)",
-"F Minor (harmonic)", "Bb Minor (harmonic)", "Eb Minor (harmonic)",
+"F# Minor (harmonic)","C# Minor (harmonic)","G# Minor (harmonic)",
+"D Minor (harmonic)","G Minor (harmonic)","C Minor (harmonic)",
+"F Minor (harmonic)","Bb Minor (harmonic)","Eb Minor (harmonic)",
 "A Minor (melodic)","E Minor (melodic)","B Minor (melodic)",
-"F# Minor (melodic)","C# Minor (melodic)", "G# Minor (melodic)",
-"D Minor (melodic)", "G Minor (melodic)", "C Minor (melodic)",
-"F Minor (melodic)", "Bb Minor (melodic)", "Eb Minor (melodic)",
+"F# Minor (melodic)","C# Minor (melodic)","G# Minor (melodic)",
+"D Minor (melodic)","G Minor (melodic)","C Minor (melodic)",
+"F Minor (melodic)","Bb Minor (melodic)","Eb Minor (melodic)"
 ];
 
-let selectedHand = "Both Hands";
-
-function setHand(hand) {
-    selectedHand = hand;
-    document.querySelectorAll(".choice-buttons button").forEach(b => b.classList.remove("active"));
-    if (hand === "Left Hand") leftBtn.classList.add("active");
-    if (hand === "Both Hands") bothBtn.classList.add("active");
-    if (hand === "Right Hand") rightBtn.classList.add("active");
-}
+const hands = ["Left Hand", "Right Hand", "Both Hands"];
 
 const canvas = document.getElementById("wheel");
 const ctx = canvas.getContext("2d");
 
 function drawWheel() {
-    const center = 175;
-    const radius = 170;
+    const center = 225;
+    const radius = 215;
     const slice = (2 * Math.PI) / scales.length;
 
     for (let i = 0; i < scales.length; i++) {
@@ -156,6 +133,7 @@ function drawWheel() {
         ctx.moveTo(center, center);
         ctx.arc(center, center, radius, i * slice, (i + 1) * slice);
         ctx.closePath();
+
         ctx.fillStyle = i % 2 === 0 ? "#1b2235" : "#121827";
         ctx.fill();
         ctx.strokeStyle = "#e6e1db";
@@ -166,26 +144,39 @@ function drawWheel() {
         ctx.rotate(i * slice + slice / 2);
         ctx.textAlign = "right";
         ctx.fillStyle = "#e6e1db";
-        ctx.font = "12px Times New Roman";
-        ctx.fillText(scales[i], radius - 10, 5);
+        ctx.font = "11px Times New Roman";
+        ctx.fillText(scales[i], radius - 18, 5);
         ctx.restore();
     }
 }
 
 drawWheel();
 
-function spinWheel() {
-    const wheel = document.getElementById("wheel");
+let chosenScale = "";
+let chosenHand = "";
+
+function spinScale() {
     const randomIndex = Math.floor(Math.random() * scales.length);
     const sliceDeg = 360 / scales.length;
     const spin = 360 * 5 + (randomIndex * sliceDeg);
 
-    wheel.style.transform = `rotate(${spin}deg)`;
+    canvas.style.transform = `rotate(${spin}deg)`;
+    chosenScale = scales[randomIndex];
 
-    setTimeout(() => {
+    setTimeout(updateResult, 4000);
+}
+
+function drawHand() {
+    chosenHand = hands[Math.floor(Math.random() * hands.length)];
+    document.getElementById("hand-box").innerText = "Hand: " + chosenHand;
+    updateResult();
+}
+
+function updateResult() {
+    if (chosenScale && chosenHand) {
         document.getElementById("result").innerText =
-            scales[randomIndex] + " — " + selectedHand;
-    }, 4000);
+            chosenScale + " — " + chosenHand;
+    }
 }
 </script>
 
