@@ -38,8 +38,8 @@ header {
 #wheel-container {
     margin-top: 40px;
     position: relative;
-    width: 350px;
-    height: 350px;
+    width: 450px;
+    height: 450px;
 }
 
 #wheel {
@@ -81,7 +81,7 @@ header {
 </header>
 
 <div id="wheel-container">
-    <canvas id="wheel" width="350" height="350"></canvas>
+    <canvas id="wheel" width="450" height="450"></canvas>
 </div>
 
 <button id="spin" onclick="spinWheel()">SPIN</button>
@@ -90,20 +90,25 @@ header {
 
 <script>
 const pedals = [
-"D Major", "Db Major", "Eb Major",
-"E Minor (melodic)","E Minor (harmonic)", "F Minor (melodic)", "F Minor (harmonic)",
-"Borken Chords Beginning on Eb",
-"Broken Chords Beginning on E",
-"Chromatic Scales Beginning on F(Ped.) and A(L.H.)",
-"Chromatic Scales Beginning on B(Ped.) and D#(L.H.)",
+"D Major",
+"Db Major",
+"Eb Major",
+"E Minor (melodic)",
+"E Minor (harmonic)",
+"F Minor (melodic)",
+"F Minor (harmonic)",
+"Broken Chords\nBeginning on Eb",
+"Broken Chords\nBeginning on E",
+"Chromatic Scales\nF (Ped.) / A (L.H.)",
+"Chromatic Scales\nB (Ped.) / D# (L.H.)"
 ];
 
 const canvas = document.getElementById("wheel");
 const ctx = canvas.getContext("2d");
 
 function drawWheel() {
-    const center = 175;
-    const radius = 170;
+    const center = 225;
+    const radius = 215;
     const slice = (2 * Math.PI) / pedals.length;
 
     for (let i = 0; i < pedals.length; i++) {
@@ -111,6 +116,7 @@ function drawWheel() {
         ctx.moveTo(center, center);
         ctx.arc(center, center, radius, i * slice, (i + 1) * slice);
         ctx.closePath();
+
         ctx.fillStyle = i % 2 === 0 ? "#1b2235" : "#121827";
         ctx.fill();
         ctx.strokeStyle = "#e6e1db";
@@ -121,8 +127,14 @@ function drawWheel() {
         ctx.rotate(i * slice + slice / 2);
         ctx.textAlign = "right";
         ctx.fillStyle = "#e6e1db";
-        ctx.font = "12px Times New Roman";
-        ctx.fillText(pedals[i], radius - 10, 5);
+        ctx.font = "11px Times New Roman";
+
+        // Handle multi-line labels
+        const lines = pedals[i].split("\n");
+        lines.forEach((line, index) => {
+            ctx.fillText(line, radius - 22, -4 + index * 14);
+        });
+
         ctx.restore();
     }
 }
@@ -130,19 +142,11 @@ function drawWheel() {
 drawWheel();
 
 function spinWheel() {
-    const wheel = document.getElementById("wheel");
     const randomIndex = Math.floor(Math.random() * pedals.length);
     const sliceDeg = 360 / pedals.length;
     const spin = 360 * 5 + (randomIndex * sliceDeg);
 
-    wheel.style.transform = `rotate(${spin}deg)`;
+    canvas.style.transform = `rotate(${spin}deg)`;
 
     setTimeout(() => {
-        document.getElementById("result").innerText =
-            pedals[randomIndex];
-    }, 4000);
-}
-</script>
-
-</body>
-</html>
+        document.getElementById(
