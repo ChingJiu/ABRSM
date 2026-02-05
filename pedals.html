@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ABRSM Scales – Pedals</title>
+<style>
+body {
+    margin: 0;
+    background: #0f1420;
+    color: #e6e1db;
+    font-family: "Times New Roman", serif;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+nav {
+    margin-top: 20px;
+}
+
+nav a {
+    color: #e6e1db;
+    text-decoration: none;
+    margin: 0 15px;
+    font-size: 16px;
+}
+
+nav a:hover {
+    text-decoration: underline;
+}
+
+header {
+    margin-top: 20px;
+    text-align: center;
+}
+
+#wheel-container {
+    margin-top: 40px;
+    position: relative;
+    width: 350px;
+    height: 350px;
+}
+
+#wheel {
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    border: 2px solid #e6e1db;
+    transition: transform 4s cubic-bezier(0.17, 0.67, 0.12, 0.99);
+}
+
+#spin {
+    margin-top: 25px;
+    padding: 12px 25px;
+    border: 1px solid #e6e1db;
+    background: #e6e1db;
+    color: #0f1420;
+    font-size: 16px;
+    font-family: "Times New Roman", serif;
+    cursor: pointer;
+}
+
+#result {
+    margin-top: 25px;
+    font-size: 20px;
+    text-align: center;
+}
+</style>
+</head>
+
+<body>
+
+<nav>
+    <a href="index.html">Hands</a>
+    <a href="pedals.html">Pedals</a>
+</nav>
+
+<header>
+    <h1>ABRSM Scale Trial — Pedals</h1>
+</header>
+
+<div id="wheel-container">
+    <canvas id="wheel" width="350" height="350"></canvas>
+</div>
+
+<button id="spin" onclick="spinWheel()">SPIN</button>
+
+<div id="result"></div>
+
+<script>
+const pedals = [
+"D Major", "Db Major", "Eb Major",
+"E Minor (melodic)","E Minor (harmonic)", "F Minor (melodic)", "F Minor (harmonic)",
+"Borken Chords Beginning on Eb",
+"Broken Chords Beginning on E",
+"Chromatic Scales Beginning on F(Ped.) and A(L.H.)",
+"Chromatic Scales Beginning on B(Ped.) and D#(L.H.)",
+];
+
+const canvas = document.getElementById("wheel");
+const ctx = canvas.getContext("2d");
+
+function drawWheel() {
+    const center = 175;
+    const radius = 170;
+    const slice = (2 * Math.PI) / pedals.length;
+
+    for (let i = 0; i < pedals.length; i++) {
+        ctx.beginPath();
+        ctx.moveTo(center, center);
+        ctx.arc(center, center, radius, i * slice, (i + 1) * slice);
+        ctx.closePath();
+        ctx.fillStyle = i % 2 === 0 ? "#1b2235" : "#121827";
+        ctx.fill();
+        ctx.strokeStyle = "#e6e1db";
+        ctx.stroke();
+
+        ctx.save();
+        ctx.translate(center, center);
+        ctx.rotate(i * slice + slice / 2);
+        ctx.textAlign = "right";
+        ctx.fillStyle = "#e6e1db";
+        ctx.font = "12px Times New Roman";
+        ctx.fillText(pedals[i], radius - 10, 5);
+        ctx.restore();
+    }
+}
+
+drawWheel();
+
+function spinWheel() {
+    const wheel = document.getElementById("wheel");
+    const randomIndex = Math.floor(Math.random() * pedals.length);
+    const sliceDeg = 360 / pedals.length;
+    const spin = 360 * 5 + (randomIndex * sliceDeg);
+
+    wheel.style.transform = `rotate(${spin}deg)`;
+
+    setTimeout(() => {
+        document.getElementById("result").innerText =
+            pedals[randomIndex];
+    }, 4000);
+}
+</script>
+
+</body>
+</html>
